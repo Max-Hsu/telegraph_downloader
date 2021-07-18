@@ -22,11 +22,11 @@ filename = os.path.basename(sys.argv[1])
 if(os.path.isfile(os.path.basename(sys.argv[1]))):
     print("\nThe file existed , not downloading the file")
 else:
-    filename = wget.download(sys.argv[1])
+    filename = wget.download(sys.argv[1],out=os.path.basename(sys.argv[1])[:100])
     
 
 print()
-imagelink = sys.argv[1].replace('/'+filename,'',-1)
+imagelink = sys.argv[1].replace('/'+os.path.basename(sys.argv[1]),'',-1)
 
 filereadstr = open(filename).read()
 #print(filereadstr)
@@ -82,17 +82,29 @@ downloading_list = []
 for link in soup.find_all('img'):
     downloading_filename = link.get('src')
     _, file_extension = os.path.splitext(downloading_filename)
-    downloading_list.append((imagelink + downloading_filename,str(counter)+file_extension))
+    if("http" in downloading_filename):
+        downloading_list.append((downloading_filename,str(counter)+file_extension))
+    else:
+        downloading_list.append((imagelink + downloading_filename,str(counter)+file_extension))
     #print(str(counter)+file_extension)
     #wget.download(imagelink + downloading_filename,out=str(counter)+file_extension)
     counter+=1
 
+#print(downloading_list)
 
 def downloading_job(thread_download_list,total_thread,num):
     #print("hi {} {} {}".format(len(thread_download_list),total_thread,num))
+    try_python_wget_or_system_wget = 0 #0 for python wget 1 for system wget
     for i in range(num,len(thread_download_list),total_thread):
         #print(num,i)
-        wget.download(thread_download_list[i][0],out=thread_download_list[i][1])
+        try:
+            if(try_python_wget_or_system_wget == 0):
+                wget.download(thread_download_list[i][0],out=thread_download_list[i][1])
+            else:
+                os.system("wget -O {0} {1}".format(thread_download_list[i][1], thread_download_list[i][0]))
+        except:
+            try_python_wget_or_system_wget = 1
+            os.system("wget -O {0} {1}".format(thread_download_list[i][1], thread_download_list[i][0]))
 
 
 thread_id = []
@@ -105,7 +117,6 @@ for i in range(multi_thread_count):
 for i in range(multi_thread_count):
     thread_id[i].join()
 
-#print(downloading_list)
 print("\ndone ;)")
 os.chdir("../")
 os.remove(filename)
