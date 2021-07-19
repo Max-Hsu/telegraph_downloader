@@ -28,7 +28,7 @@ else:
 print()
 imagelink = sys.argv[1].replace('/'+os.path.basename(sys.argv[1]),'',-1)
 
-filereadstr = open(filename).read()
+filereadstr = open(filename, encoding='UTF-8').read()
 #print(filereadstr)
 
 soup = BeautifulSoup(filereadstr, 'html.parser')
@@ -69,10 +69,10 @@ try:
 except FileExistsError:
     pass
 os.chdir(final_dir_name)
-actual_name_write = open('actual_name','w')
+actual_name_write = open('actual_name','w', encoding='UTF-8')
 actual_name_write.write(hname)
 actual_name_write.close()
-actual_name_write = open('actual_link','w')
+actual_name_write = open('actual_link','w', encoding='UTF-8')
 actual_name_write.write(sys.argv[1])
 actual_name_write.close()
 
