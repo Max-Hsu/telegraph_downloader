@@ -38,7 +38,12 @@ extract_name = str(list(content)[0])
 soup2 = BeautifulSoup(extract_name, 'html.parser')
 hname = str(soup2.find('h1').get_text())
 
-extract_circle_artist = re.search('\[[^\]]*\]', hname ).group(0)
+extract_circle_artist = re.search('\[[^\]]*\]', hname )
+if (extract_circle_artist == None):
+    extract_circle_artist = hname
+else:
+    extract_circle_artist = extract_circle_artist.group(0)
+
 hname_remove_artist = hname.replace(extract_circle_artist,'',-1)
 hname_rmA_remove_blank = hname_remove_artist.replace(" ","",-1)
 
